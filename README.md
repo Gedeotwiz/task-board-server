@@ -19,6 +19,11 @@ For a production build, run `npm run build` then `npm start`.
 - `GET /api/tasks`, `POST /api/tasks`
 - `GET /api/tasks/:taskId`, `PATCH /api/tasks/:taskId`, `DELETE /api/tasks/:taskId`
 - `GET /api/members`, `POST /api/members`, `DELETE /api/members/:memberId`
+- `POST /api/members/login`, `POST /api/members/forgot-password`, `POST /api/members/verify-otp`
+
+Create a member with `name`, `phone`, `email`, and a password of at least 8 characters. Members sign in with email and password. For password resets, configure `EMAIL_API_URL` (and optionally `EMAIL_API_KEY`) to point to an email API that accepts `{ to, subject, text }` JSON and returns a successful HTTP status. Request a code with `POST /api/members/forgot-password`, then submit `email`, `otp`, and `newPassword` to `POST /api/members/verify-otp`. Reset codes expire after 10 minutes.
+
+Login returns `{ "token": "..." }`. Set `ACCESS_TOKEN_SECRET` to a long, random secret; access tokens are signed with HS256 and expire after one hour.
 
 A task's `members` field is an array of member IDs, matching the frontend's existing data shape. Update that field with `PATCH /api/tasks/:taskId` to assign or unassign members. Update `status` with one of `todo`, `progress`, or `done`.
 

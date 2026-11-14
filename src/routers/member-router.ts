@@ -4,6 +4,7 @@ import {
   deleteMember,
   listMembers,
 } from '../controllers/member-controller.js';
+import { login, requestPasswordOtp, verifyOtpAndResetPassword } from '../controllers/auth-controller.js';
 
 export const memberRouter = Router();
 
@@ -30,12 +31,17 @@ export const memberRouter = Router();
  *         application/json:
  *           schema:
  *             type: object
- *             required: [name]
+ *             required: [name, phone, email, password]
  *             properties:
  *               name:
  *                 type: string
  *               email:
  *                 type: string
+ *               phone:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *                 minLength: 8
  *               color:
  *                 type: string
  *     responses:
@@ -46,6 +52,50 @@ export const memberRouter = Router();
  */
 memberRouter.get('/', listMembers);
 memberRouter.post('/', createMember);
+memberRouter.post('/login', login);
+memberRouter.post('/forgot-password', requestPasswordOtp);
+memberRouter.post('/verify-otp', verifyOtpAndResetPassword);
+
+/** @openapi
+ * /api/members/login:
+ *   post:
+ *     summary: Log in a member with email and password
+ *     tags: [Members]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [email, password]
+ *             properties:
+ *               email: { type: string, format: email }
+ *               password: { type: string }
+ *     responses:
+ *       200:
+ *         description: Signed in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token: { type: string }
+ *       401: { description: Invalid credentials }
+ */
+/** @openapi
+ * /api/members/forgot-password:
+ *   post:
+ *     summary: Send a password reset OTP to the member email
+ *     tags: [Members]
+ *     responses: { 200: { description: Reset code sent when the account exists }, 503: { description: Email delivery unavailable } }
+ */
+/** @openapi
+ * /api/members/verify-otp:
+ *   post:
+ *     summary: Verify a reset OTP and set a new password
+ *     tags: [Members]
+ *     responses: { 200: { description: Password reset }, 400: { description: Invalid or expired OTP } }
+ */
 
 /** @openapi
  * /api/members/{memberId}:

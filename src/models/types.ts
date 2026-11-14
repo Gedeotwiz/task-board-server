@@ -7,6 +7,10 @@ export interface Member {
   initials: string;
   color: string;
   email?: string;
+  phone?: string;
+  passwordHash?: string;
+  passwordResetOtpHash?: string;
+  passwordResetOtpExpiresAt?: Date;
 }
 
 export interface Task {
