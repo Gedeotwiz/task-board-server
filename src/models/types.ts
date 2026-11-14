@@ -22,7 +22,3 @@ export interface Task {
   priority: Priority;
 }
 
-export interface Database {
-  members: Member[];
-  tasks: Task[];
-}

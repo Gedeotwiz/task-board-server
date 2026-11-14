@@ -84,8 +84,14 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/api', router);
 app.use(errorHandler);
 
-connectToDatabase();
+async function startServer(): Promise<void> {
+  await connectToDatabase();
+  app.listen(port, () =>
+    console.log(`TaskBoard API listening on http://localhost:${port}/api-docs`),
+  );
+}
 
-app.listen(port, () =>
-  console.log(`TaskBoard API listening on http://localhost:${port}/api-docs`),
-);
+startServer().catch((error: unknown) => {
+  console.error('Failed to start TaskBoard API:', error);
+  process.exitCode = 1;
+});

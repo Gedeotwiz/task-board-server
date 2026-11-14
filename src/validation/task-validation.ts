@@ -1,4 +1,4 @@
-import type { Database, Priority, TaskStatus } from '../models/types.js';
+import type { Priority, TaskStatus } from '../models/types.js';
 import { isRecord } from './common.js';
 
 const statuses: TaskStatus[] = ['todo', 'progress', 'done'];
@@ -6,7 +6,7 @@ const priorities: Priority[] = ['Low', 'Medium', 'High'];
 
 export function validateCreateTask(
   input: unknown,
-  db: Database,
+  memberIds: ReadonlySet<string>,
 ):
   { error: string } | { value: Omit<import('../models/types.js').Task, 'id'> } {
   if (
@@ -20,7 +20,7 @@ export function validateCreateTask(
     input.members.every((id) => typeof id === 'string')
       ? (input.members as string[])
       : [];
-  if (members.some((id) => !db.members.some((member) => member.id === id)))
+  if (members.some((id) => !memberIds.has(id)))
     return { error: 'One or more assigned members do not exist' };
   return {
     value: {
@@ -53,7 +53,7 @@ export function validateCreateTask(
 
 export function validateTaskPatch(
   input: unknown,
-  db: Database,
+  memberIds: ReadonlySet<string>,
 ): { error: string; status: 400 } | { value: Record<string, unknown> } {
   if (!isRecord(input))
     return { error: 'JSON object body required', status: 400 };
@@ -85,7 +85,7 @@ export function validateTaskPatch(
       return { error: 'members must be an array of member IDs', status: 400 };
     if (
       (value.members as string[]).some(
-        (id) => !db.members.some((member) => member.id === id),
+        (id) => !memberIds.has(id),
       )
     )
       return {
